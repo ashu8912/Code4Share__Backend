@@ -10,7 +10,16 @@ if(err.hasOwnProperty("details")){
        success:false
 }
 
-}else {
+}else if(!err.message)
+{
+    let error=new Error(err);
+    return {
+        message:error.message,
+        code,
+        success:false
+    }
+}
+else {
     return {
         message:err.message,
         code,
