@@ -5,7 +5,6 @@ const Schema=mongoose.Schema;
 const userSchema=new Schema({
     email:{
         type:String,
-        required:"email is required",
         unique:"email must be unique"
     },
     name:{
@@ -13,10 +12,15 @@ const userSchema=new Schema({
         required:"name is required"
     },
     password:{
-       type:String,
-       required:"password is required"
+       type:String
     },
+    facebookId:String
 })
+userSchema.methods.toJSON = function() {
+    var obj = this.toObject();
+    delete obj.password;
+    return obj;
+   }
 userSchema.pre("save",function(next){
     var user = this;
 
