@@ -7,8 +7,9 @@ const passport=require("passport");
 const session=require("express-session");
 const indexRoutes=require("./routes");
 const authRoutes=require("./routes/auth");
+const taskRoutes=require("./routes/task");
 app.use(cors({
-    origin:"http://localhost:3000",
+    origin:true,
     credentials:true
 }));
 
@@ -23,7 +24,20 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/api",indexRoutes);
-app.use("/api",authRoutes);
+app.use("/",authRoutes);
+app.use("/api",taskRoutes);
+if (process.env.NODE_ENV === 'production') {
+    // Express will serve up production assets
+    // like our main.js file, or main.css file!
+    app.use(express.static('frontend/build'));
+  
+    // Express will serve up the index.html file
+    // if it doesn't recognize the route
+    const path = require('path');
+    app.get('*', (req, res) => {
+      res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+    });
+  }
 const errorHandlers=require('./handlers/errorHandler');
 app.get("*",errorHandlers.notFound);
 app.use(errorHandlers.productionErrors);
