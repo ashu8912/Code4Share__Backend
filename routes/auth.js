@@ -8,7 +8,7 @@ const {errorShaper}=require("../utils/errorShaper");
 const {responseShaper}=require("../utils/responseShaper");
 const {checkLogin}=require("../middlewares");
 
-router.post("/login",function(req,res,next){
+router.post("/api/login",function(req,res,next){
         passport.authenticate('local', function(err, user, info) {
           if (err) { return next(err) }
           if (!user) {
@@ -26,7 +26,7 @@ router.post("/login",function(req,res,next){
       }
 )
 
-router.post("/register",(req,res,next)=>{
+router.post("/api/register",(req,res,next)=>{
     let registerSchema=joi.object({
         "name":joi.string().required(),
         "email":joi.string().email().required(),
@@ -50,7 +50,16 @@ res.json(responseShaper(user,"successfully created user"));
        }
    }) 
 })
-router.get("/me",checkLogin,(req,res)=>{
+router.get("/api/logout",(req,res)=>{
+    req.logOut();
+    req.session.user=null;
+    res.json({message:"successfully logged out",code:200,success:true,errors:{}});
+})
+router.get("/api/me",checkLogin,(req,res)=>{
 res.json(responseShaper(req.session.user,"you are logged in"))
 })
+router.get("/auth/facebook",passport.authenticate("facebook",{scope:"email"}))
+router.get("/auth/facebook/callback",passport.authenticate("facebook"),(req,res)=>{
+    req.session.user=req.user;
+    res.redirect("/")})
 module.exports=router;
